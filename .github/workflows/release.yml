@@ -21,11 +21,30 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+        with:
+          repository: 'ArtifexSoftware/mupdf'
+          submodules: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.9.0'
+          
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.6'
+
+      - uses: microsoft/setup-msbuild@v2  
+
+      # Runs a set of commands using the runners shell
+      - name: Build
+        shell: pwsh
+        run: |
+          msbuild platform/win32/mupdf.sln /p:Configuration=Release /p:Platform=x64
 
       - name: Zip
-        shell: bash
         run: |
-          dd if=/dev/urandom of=release.zip bs=1M count=1000
+          7z a release.zip platform/win32/x64/Release
 
       # Runs a set of commands using the runners shell
       - name: Release
